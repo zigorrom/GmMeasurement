@@ -1,0 +1,170 @@
+﻿<Window
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:ZedGraph="clr-namespace:ZedGraph;assembly=ZedGraph"
+		 xmlns:wf="clr-namespace:System.Windows.Forms;assembly=System.Windows.Forms"  
+        xmlns:System="clr-namespace:System;assembly=mscorlib" x:Class="GmMeasurement.MainWindow"  
+        Title="MainWindow" Height="519" Width="668">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="119*"/>
+            <ColumnDefinition Width="46*"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition />
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="11*"/>
+                <ColumnDefinition Width="108*"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="464*"/>
+                <RowDefinition Height="5*"/>
+            </Grid.RowDefinitions>
+        </Grid>
+        <StatusBar Height="20" Grid.Row="1" VerticalAlignment="Top" HorizontalContentAlignment="Stretch" Grid.ColumnSpan="2" >
+		<ProgressBar Name="ProgressBar1"  Height="20" Width="650" VerticalAlignment="Center" VerticalContentAlignment="Center" HorizontalAlignment="Center" HorizontalContentAlignment="Center" Minimum="0" Maximum="100"></ProgressBar></StatusBar>
+        <Grid Grid.Row="0" Grid.Column="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="10"/>
+                <RowDefinition Height="98"/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+            <Expander x:Name="ExpanderKeithleySettings" Grid.Row="0" Grid.Column="0" Header="Front Gate" Margin="5">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition MaxHeight="25" Height="25"/>
+                        <RowDefinition MaxHeight="25"  Height="25"/>
+                        <RowDefinition MaxHeight="25" Height="25"/>
+
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition />
+                        <ColumnDefinition />
+                        <ColumnDefinition />
+                    </Grid.ColumnDefinitions>
+
+                    <Label Grid.Row="0" Grid.Column="0" Content="Start" />
+                    <Label Grid.Row="1" Grid.Column="0" Content="Stop"/>
+                    <Label Grid.Row="2" Grid.Column="0" Content="Points" ToolTip="Number of Points" />
+
+					 
+                    <TextBox Grid.Row="1" Grid.Column="1" x:Name="FrontGateVoltageStop" Text="{Binding FrontGateVoltageStop, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" RenderTransformOrigin="0.523,0.52" />
+                    <TextBox Grid.Row="0" Grid.Column="1" x:Name="FrontGateVoltageStart" Text="{Binding FrontGateVoltageStart, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" RenderTransformOrigin="0.523,0.52" Height="25" VerticalAlignment="Top"/>
+                    <TextBox Grid.Row="2" Grid.Column="1" x:Name="FrontGateVoltageNumberOfPoints" Text="{Binding FrontGateVoltageNumberOfPoints, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" RenderTransformOrigin="0.523,0.52"/>
+
+                    <ComboBox Grid.Row="0" Grid.Column="2" x:Name="FrontGateVoltageStartUnits" Text="{Binding FrontGateVoltageStartUnits, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                        <ComboBoxItem IsSelected="true">mV</ComboBoxItem>
+                        <ComboBoxItem>V</ComboBoxItem>
+                    </ComboBox>
+                    <ComboBox Grid.Row="1" Grid.Column="2" x:Name="FrontGateVoltageStopUnits" Text="{Binding FrontGateVoltageStopUnits, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                        <ComboBoxItem IsSelected="true">mV</ComboBoxItem>
+                        <ComboBoxItem>V</ComboBoxItem>
+                    </ComboBox>
+                    <Button Content="No Sweep" Grid.Column="2" Grid.Row="2" Click="FrontGateNoSweepClick"/>
+
+                </Grid>
+            </Expander>
+
+            <Expander x:Name="ExpanderBackGateKeithleySettings" Grid.Row="1" Header="Back Gate" Margin="5" Grid.RowSpan="2">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition MaxHeight="25" Height="25"/>
+                        <RowDefinition MaxHeight="25"  Height="25"/>
+                        <RowDefinition MaxHeight="25" Height="25"/>
+                        <RowDefinition Height="353*"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="5*" />
+                        <ColumnDefinition Width="53*"/>
+                        <ColumnDefinition Width="57*" />
+                        <ColumnDefinition Width="57*" />
+                    </Grid.ColumnDefinitions>
+
+                    <Label Grid.Row="0" Grid.Column="0" Content="Start" Grid.ColumnSpan="2" />
+                    <Label Grid.Row="1" Grid.Column="0" Content="Stop" Grid.ColumnSpan="2"/>
+                    <Label Grid.Row="2" Grid.Column="0" Content="Points" ToolTip="Number of Points" Grid.ColumnSpan="2" />
+
+
+                    <TextBox Grid.Row="1" Grid.Column="2" x:Name="BackGateVoltageStop" Text="{Binding BackGateVoltageStop, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" RenderTransformOrigin="0.523,0.52" Margin="0,0,-0.001,0" />
+                    <TextBox Grid.Row="0" Grid.Column="2" x:Name="BackGateVoltageStart" Text="{Binding BackGateVoltageStart, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" RenderTransformOrigin="0.523,0.52" Margin="0,0,-0.001,0"/>
+                    <TextBox Grid.Row="2" Grid.Column="2" x:Name="BackGateVoltageNumberOfPoints" Text="{Binding BackGateVoltageNumberOfPoints, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" RenderTransformOrigin="0.523,0.52" Margin="0,0,-0.001,0"/>
+
+                    <ComboBox Grid.Row="0" Grid.Column="3" x:Name="BackGateVoltageStartUnits" Text="{Binding BackGateVoltageStartUnits, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Margin="0.001,0,0,0">
+                        <ComboBoxItem IsSelected="true">mV</ComboBoxItem>
+                        <ComboBoxItem>V</ComboBoxItem>
+                    </ComboBox>
+                    <ComboBox Grid.Row="1" Grid.Column="3" x:Name="BackGateVoltageStopUnits" Text="{Binding BackGateVoltageStopUnits, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Margin="0.001,0,0,0">
+                        <ComboBoxItem IsSelected="true">mV</ComboBoxItem>
+                        <ComboBoxItem>V</ComboBoxItem>
+                    </ComboBox>
+                    <Button Content="No Sweep" Grid.Column="3" Grid.Row="2" Click="BackGateNoSweepClick" Margin="0.001,0,0,0"/>
+
+                </Grid>
+            </Expander>
+            <Grid Grid.Row="3" Margin="5">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+                <Button Grid.Row="0" Grid.Column="0" Click="OpenFolderClick" >
+                    <Image x:Name="click" Source="Resources/open.png" Width="50"/>
+                </Button>
+                <Label Grid.Row="1" Grid.Column="0" Margin="1,5,1,1">Filename:</Label>
+                <TextBox Grid.Row="1" Grid.Column="1" Margin="1,5,1,1" Text="{Binding FileName,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+
+                <TextBox Grid.Row="0" Grid.Column="1" IsReadOnly="True" Text="{Binding WorkFolder,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Margin="1" TextWrapping="Wrap"></TextBox>
+
+                <Label Grid.Row="2" Grid.Column="0" Margin="1,5,1,1" ToolTip="Current Amplifier Coefficient">KAmpl.</Label>
+                <ComboBox Grid.Row="2" Grid.Column="1" Margin="1,5,1,1" Text="{Binding KAmpl,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" SelectionChanged="Test">
+                    <ComboBoxItem IsSelected="true">1</ComboBoxItem>
+                    <ComboBoxItem>10</ComboBoxItem>
+                    <ComboBoxItem>100</ComboBoxItem>
+                    <ComboBoxItem>1e03</ComboBoxItem>
+                    <ComboBoxItem>1e04</ComboBoxItem>
+                    <ComboBoxItem>1e05</ComboBoxItem>
+                    <ComboBoxItem>1e06</ComboBoxItem>
+                    <ComboBoxItem>1e07</ComboBoxItem>
+                    <ComboBoxItem>1e08</ComboBoxItem>
+                    <ComboBoxItem>1e09</ComboBoxItem>
+                    <ComboBoxItem>1e10</ComboBoxItem>
+                    <ComboBoxItem>1e11</ComboBoxItem>
+                </ComboBox>
+                <Label Grid.Row="3" Grid.Column="0" Margin="1,5,1,1" ToolTip="Value of Stimulus Applied to Front Gate Voltage">Stim. Val.:</Label>
+                <Grid Grid.Row="3" Grid.Column="1">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition />
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                
+                    <TextBox Margin="1,1,4,1" Text="{Binding StimulationValue,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" VerticalContentAlignment="Center"  />
+                    <Button Grid.Column="1" Content="Mea" Width="Auto" HorizontalAlignment="Right" Click="MeasureStimulationValue"  />
+
+                </Grid>
+
+
+                <Button Grid.Row="4" Content="Start Measurement" Height="40" Margin="1,20,1,1" Grid.ColumnSpan="2" Click="StartMeasurement"/>
+                <Button Grid.Row="5" Content="Stop Measurement" Height="40" Margin="1,20,1,1" Grid.ColumnSpan="2" Click="StopMeasurement"/>
+
+            </Grid>
+        </Grid>
+
+        <WindowsFormsHost Grid.Column="0" Grid.Row="0">
+            <ZedGraph:ZedGraphControl x:Name="MyZedGraph"/>
+        </WindowsFormsHost>
+    </Grid>
+
+</Window>
+	
