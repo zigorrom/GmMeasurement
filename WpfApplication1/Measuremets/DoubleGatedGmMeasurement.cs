@@ -1,38 +1,36 @@
-﻿using System;
-
-using System.ComponentModel;
+﻿using HP34401A;
+using Keithley24XXFamily;
+using KeithleyOldMultimeter;
+using StanfordLockInSR830;
+using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Threading;
-using Keithley24XXFamily;
-using HP34401A;
-using Devices;
-using KeithleyOldMultimeter;
-using StanfordLockInSR830;
 
 namespace GmMeasurement
 {
-    class GmMeasurementParameters
+    class DoubleGatedGmMeasurementParameters
     {
-        public double FrontGateVoltageStart=0;
-        public double FrontGateVoltageStop=0;
-        public double FrontGateVoltageIncrement=0;
-        public int FrontGateVoltageNumberOfPoints=0;
+        public double FrontGateVoltageStart = 0;
+        public double FrontGateVoltageStop = 0;
+        public double FrontGateVoltageIncrement = 0;
+        public int FrontGateVoltageNumberOfPoints = 0;
 
-        public double BackGateVoltageStart=0;
-        public double BackGateVoltageStop=0;
-        public double BackGateVoltageIncrement=0;
-        public int BackGateNumberOfPoints=0;
+        public double BackGateVoltageStart = 0;
+        public double BackGateVoltageStop = 0;
+        public double BackGateVoltageIncrement = 0;
+        public int BackGateNumberOfPoints = 0;
 
-        public double kAmpl=0;
-        public double StimulationValue=0;
+        public double kAmpl = 0;
+        public double StimulationValueFG = 0;
+        public double StimulationValueBG = 0;
 
-        public string FileName="";
-        public string folder="";
+        public string FileName = "";
+        public string folder = "";
 
-        public GmMeasurementParameters(MainWindow_DataModel data)
+        public DoubleGatedGmMeasurementParameters(MainWindow_DataModel data)
         {
             FrontGateVoltageStart = data.FrontGateVoltageStart;
             FrontGateVoltageStop = data.FrontGateVoltageStop;
@@ -43,7 +41,7 @@ namespace GmMeasurement
                 FrontGateVoltageIncrement = 0;
             }
             else
-             FrontGateVoltageIncrement = (FrontGateVoltageStop - FrontGateVoltageStart) / (FrontGateVoltageNumberOfPoints - 1);
+                FrontGateVoltageIncrement = (FrontGateVoltageStop - FrontGateVoltageStart) / (FrontGateVoltageNumberOfPoints - 1);
 
             BackGateVoltageStart = data.BackGateVoltageStart;
             BackGateVoltageStop = data.BackGateVoltageStop;
@@ -54,57 +52,70 @@ namespace GmMeasurement
                 BackGateVoltageIncrement = 0;
             }
             else
-            BackGateVoltageIncrement = (BackGateVoltageStop - BackGateVoltageStart) / (BackGateNumberOfPoints-1);
+                BackGateVoltageIncrement = (BackGateVoltageStop - BackGateVoltageStart) / (BackGateNumberOfPoints - 1);
             kAmpl = data.KAmpl;
-            StimulationValue = data.StimulationValueFG;
+            StimulationValueFG = data.StimulationValueFG;
+            StimulationValueBG = data.StimulationValueBG;
         }
 
     }
-    class GmMeasurement
+    class DoubleGatedGmMeasurement
     {
-       
-        private GmMeasurementParameters _MeasurementParameters;
+        private DoubleGatedGmMeasurementParameters _MeasurementParameters;
         private Keithley_24XX FrontGateKeithley;
         private Keithley_24XX BackGateKeithley;
         private KeithleyMultimeter SampleVoltage;
-        private StanfordSR830 GmMeasurer;
+        private StanfordSR830 GmMeasurer_FG;
+        private StanfordSR830 GmMeasurer_BG;
         public BackgroundWorker _MainWorker;
         private HP34401AMultimeter CurrentMeasurer;
-        public GmMeasurement(GmMeasurementParameters MeasurementParameters)
+        public DoubleGatedGmMeasurement(DoubleGatedGmMeasurementParameters MeasurementParameters)
         {
             this._MeasurementParameters = MeasurementParameters;
             FrontGateKeithley = new Keithley_24XX("2400");
             BackGateKeithley = new Keithley_24XX("2430");
             SampleVoltage = new KeithleyMultimeter("NDCV");
             CurrentMeasurer = new HP34401AMultimeter("34401");
-            GmMeasurer = new StanfordSR830("SR830");
+            GmMeasurer_FG = new StanfordSR830("SR830",0);
+            GmMeasurer_BG = new StanfordSR830("SR830", 1);
             if (!FrontGateKeithley.isAlive) throw new Exception("Keithley 2400 does not work");
             if (!BackGateKeithley.isAlive) throw new Exception("Keithley 2430 does not work");
             if (!SampleVoltage.isAlive) throw new Exception("Keithley Multimeter does not work");
             if (!CurrentMeasurer.isAlive) throw new Exception("HP34401a Multimeter does not work");
-            if (!GmMeasurer.isAlive) throw new Exception("Stanford SR830 Lock in does not work");
-            
+            if (!GmMeasurer_FG.isAlive) throw new Exception("Stanford SR830 Lock in does not work");
+            if (!GmMeasurer_BG.isAlive) throw new Exception("Stanford SR830 Lock in does not work");
         }
         
         private void PerformSinglePointMeasurement(double FrontGateVoltage, double BackGateVoltage)
         {
             FrontGateKeithley.SourceVoltage(FrontGateVoltage);
             BackGateKeithley.SourceVoltage(BackGateVoltage);
-            var Result = new GmDataString();
+
+            var Result = new DoubleGatedGmDataString();
             Result.FrontGateVoltage=FrontGateVoltage;
             Result.BackGateVoltage=BackGateVoltage;
+
             double Voltage,Current,Resistance,Signal;
+            
             FrontGateKeithley.MeasureAll(out Voltage, out Current, out Resistance);
             Result.FrontGateCurrent = Current;
+            
             BackGateKeithley.MeasureAll(out Voltage, out Current, out Resistance);
             Result.BackGateCurrent = Current;
-            GmMeasurer.ReadSignal(out Signal);
-            Result.Gm = Signal / _MeasurementParameters.kAmpl / _MeasurementParameters.StimulationValue;
+            
+            GmMeasurer_FG.ReadSignal(out Signal);
+            Result.GmFG = Signal / _MeasurementParameters.kAmpl / _MeasurementParameters.StimulationValueFG;
+
+            GmMeasurer_BG.ReadSignal(out Signal);
+            Result.GmBG = Signal / _MeasurementParameters.kAmpl / _MeasurementParameters.StimulationValueBG;
+
             SampleVoltage.ReadVoltage(out Voltage);
             Result.SampleVoltage = Voltage;
+
             CurrentMeasurer.ReadVoltage(out Voltage);
             Result.SampleCurrent = Voltage / _MeasurementParameters.kAmpl;
-            AllCustomEvents.Instance.OnDataPoint_Arrived(this, new PointArrivedEventArgs(Result));
+
+            AllCustomEvents.Instance.OnDataPoint_Arrived(this, new DoubleGatedPointArrivedEventArgs(Result));
         }
 
         private void MapGmInWorker(object sender, DoWorkEventArgs e )
@@ -172,8 +183,6 @@ namespace GmMeasurement
                 _MainWorker.CancelAsync();
             }
         }
-
-
 
     }
 }

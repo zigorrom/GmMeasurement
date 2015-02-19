@@ -70,28 +70,47 @@ System.Windows.Forms.DialogResult result = dialog.ShowDialog();
         #region FormMeasurementActivity
 
         I_V_Graph GraphicManager;
-        GmMeasurementFileManager FileManager;
+        GmMeasurementFileManager SingleGateFileManager;
+        DoubleGatedGmMeasurementFileManager DoubleGateFileManager;
+
         private void MeasureStimulationValue(object sender, System.Windows.RoutedEventArgs e)
         {
             if (ImportantConstants.MeasurementInProgress) return;
-                StanfordSR830 Mea = new StanfordSR830("SR830");
-                double result = 1;
-                if (Mea.isAlive)
-                    Mea.ReadSignal(out result);
-                model.StimulationValue = result;
-                Mea.Dispose();
-            }
+            StanfordSR830 MeaFG = new StanfordSR830("SR830", 0);
+            StanfordSR830 MeaBG = new StanfordSR830("SR830", 1);
+            double result = 1;
+            if (MeaFG.isAlive)
+                MeaFG.ReadSignal(out result);
+            model.StimulationValueFG = result;
+            if (MeaBG.isAlive)
+                MeaBG.ReadSignal(out result);
+            model.StimulationValueBG = result;
+            MeaFG.Dispose();
+            MeaBG.Dispose();
+        }
 
-        GmMeasurement MainMeasurer;
+        
+       
         private void StartMeasurement(object sender, System.Windows.RoutedEventArgs e)
         {
-            ProgressBar1.Value = 0; 
+
+            switch (model.DoubleGatedMeasurement)
+            {
+                case true: DoubleGateMeasurement(); break;
+                case false: SingleGateMeasurement(); break;
+            }
+        	// TODO: Add event handler implementation here.
+        }
+        GmMeasurement SingleGateMeasurer;
+        private void SingleGateMeasurement()
+        {
+            ProgressBar1.Value = 0;
             GmMeasurementParameters DefinedInFormMeasurementSettings = new GmMeasurementParameters(model);
             try
             {
-                MainMeasurer = new GmMeasurement(DefinedInFormMeasurementSettings);
+                SingleGateMeasurer = new GmMeasurement(DefinedInFormMeasurementSettings);
             }
-            catch(Exception ebl )
+            catch (Exception ebl)
             {
                 MessageBox.Show(ebl.Message);
                 return;
@@ -100,27 +119,56 @@ System.Windows.Forms.DialogResult result = dialog.ShowDialog();
             GraphicManager.PrepareForMeasurement(DefinedInFormMeasurementSettings.BackGateVoltageStart);
             AllCustomEvents.Instance.MeasurementProgressReported += SetProgressBar;
             AllCustomEvents.Instance.MeasurementFinished += FinishAllAfterMeasurement;
-            FileManager = new GmMeasurementFileManager(model.WorkFolder);
-            while (FileManager.FileExists(model.FileName)) model.FileName = FileManager.suggestFileNameWithIncrement(model.FileName);
-            FileManager.PrepareForMeasurement(model.FileName);
+            SingleGateFileManager = new GmMeasurementFileManager(model.WorkFolder);
+            while (SingleGateFileManager.FileExists(model.FileName)) model.FileName = SingleGateFileManager.suggestFileNameWithIncrement(model.FileName);
+            SingleGateFileManager.PrepareForMeasurement(model.FileName);
             ProgressBar1.Value = 0;
-            MainMeasurer.StartGmMeasurement();
-            
-        	// TODO: Add event handler implementation here.
+            SingleGateMeasurer.StartGmMeasurement();
+        }
+
+
+
+        DoubleGatedGmMeasurement DoubleGateMeasurer;
+        private void DoubleGateMeasurement()
+        {
+            ProgressBar1.Value = 0;
+            DoubleGatedGmMeasurementParameters DefinedInFormMeasurementSettings = new DoubleGatedGmMeasurementParameters(model);
+            try
+            {
+                DoubleGateMeasurer = new DoubleGatedGmMeasurement(DefinedInFormMeasurementSettings);
+            }
+            catch (Exception ebl)
+            {
+                MessageBox.Show(ebl.Message);
+                return;
+            }
+            GraphicManager = new I_V_Graph(MyZedGraph);
+            GraphicManager.PrepareForMeasurement(DefinedInFormMeasurementSettings.BackGateVoltageStart);
+            AllCustomEvents.Instance.MeasurementProgressReported += SetProgressBar;
+            AllCustomEvents.Instance.MeasurementFinished += FinishAllAfterMeasurement;
+            DoubleGateFileManager = new DoubleGatedGmMeasurementFileManager(model.WorkFolder);
+            while (DoubleGateFileManager.FileExists(model.FileName)) model.FileName = DoubleGateFileManager.suggestFileNameWithIncrement(model.FileName);
+            DoubleGateFileManager.PrepareForMeasurement(model.FileName);
+            ProgressBar1.Value = 0;
+            DoubleGateMeasurer.StartGmMeasurement();
         }
         private void FinishAllAfterMeasurement(object sender, EventArgs e)
         {
-            
             GraphicManager.FinishMeasurement();
-            FileManager.FinishMeasurement();
-            MainMeasurer = null;
+            SingleGateFileManager.FinishMeasurement();
+            SingleGateMeasurer = null;
+            DoubleGateFileManager.FinishMeasurement();
+            DoubleGateMeasurer = null;
         }
 
         private void StopMeasurement(object sender, System.Windows.RoutedEventArgs e)
         {
         	// TODO: Add event handler implementation here.
-            if(ImportantConstants.MeasurementInProgress)
-            MainMeasurer.StopGmMeasurement();
+            if (ImportantConstants.MeasurementInProgress)
+            {
+                SingleGateMeasurer.StopGmMeasurement();
+                DoubleGateMeasurer.StopGmMeasurement();
+            }
             
         }
         private void SetProgressBar(object sender, MeasurementProgressReportedEventArgs eventArgs)

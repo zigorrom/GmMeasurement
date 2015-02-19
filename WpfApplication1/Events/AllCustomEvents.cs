@@ -28,6 +28,32 @@ namespace GmMeasurement
                 handler(Sender, e);
             }
         }
+        public virtual void OnDataPoint_Arrived(object Sender,DoubleGatedPointArrivedEventArgs e)
+        {
+            EventHandler<DoubleGatedPointArrivedEventArgs> handler = _DoubleGatedPoint_Arrived;
+            if (handler != null)
+            {
+                handler(Sender, e);
+            }
+        }
+
+        private EventHandler<DoubleGatedPointArrivedEventArgs> _DoubleGatedPoint_Arrived;
+        public event EventHandler<DoubleGatedPointArrivedEventArgs> DoubleGatedPoint_Arrived
+        {
+            add
+            {
+                if (_DoubleGatedPoint_Arrived == null || !_DoubleGatedPoint_Arrived.GetInvocationList().Contains(value))
+                {
+                    _DoubleGatedPoint_Arrived += value;
+                }
+            }
+            remove
+            {
+                _DoubleGatedPoint_Arrived -= value;
+            }
+        }
+
+
         private EventHandler<PointArrivedEventArgs> _DataPoint_Arrived;
         public event EventHandler<PointArrivedEventArgs> DataPoint_Arrived
         {

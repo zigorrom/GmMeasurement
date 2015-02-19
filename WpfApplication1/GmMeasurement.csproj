@@ -71,16 +71,20 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="DataHandling\DataStrings\DoubleGatedGmDataString.cs" />
     <Compile Include="DataHandling\DataStrings\GmDataString.cs" />
     <Compile Include="DataHandling\ImportantConstants.cs" />
+    <Compile Include="DataHandling\ListOfDataStrings\DoubleGatedListGmDataString.cs" />
     <Compile Include="DataHandling\ListOfDataStrings\ListGmDataString.cs" />
     <Compile Include="DataHandling\ParentClasses\DataString.cs" />
     <Compile Include="DataHandling\ParentClasses\ListDataString.cs" />
     <Compile Include="DataHandling\ParentClasses\MeasurDataInterface.cs" />
     <Compile Include="Events\AllCustomEvents.cs" />
+    <Compile Include="Events\EventArgs\DoubleGatedPointArrivedEventArgs.cs" />
     <Compile Include="Events\EventArgs\MeasurementFinishedEventArgs.cs" />
     <Compile Include="Events\EventArgs\MeasurementProgressReportedEventArgs.cs" />
     <Compile Include="Events\EventArgs\PointArrivedEventArgs.cs" />
+    <Compile Include="FileManager\DoubleGatedGmMeasurementFileManager.cs" />
     <Compile Include="FileManager\FileManagerParent.cs" />
     <Compile Include="FileManager\GmMeasurementFileManager.cs" />
     <Compile Include="Graphics\I-V.cs" />
@@ -91,6 +95,7 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Measuremets\DoubleGatedGmMeasurement.cs" />
     <Compile Include="Measuremets\GmMeasurement.cs" />
     <Compile Include="MVVM\MainWindow_DataModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">

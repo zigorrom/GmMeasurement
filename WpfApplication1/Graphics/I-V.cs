@@ -57,6 +57,19 @@ namespace GmMeasurement
             SetCurrentCurveName(initialBackGate);
             AddCurveForBackGate(_CurrentBackGate);
             AllCustomEvents.Instance.DataPoint_Arrived += DataArrived;
+            AllCustomEvents.Instance.DoubleGatedPoint_Arrived += DoubleGatedPointArrived;
+        }
+
+        void DoubleGatedPointArrived(object sender, DoubleGatedPointArrivedEventArgs e)
+        {
+            if (e.data.BackGateVoltage != _CurrentBackGate)
+            {
+                SetCurrentBackgate(e.data.BackGateVoltage);
+                SetCurrentCurveName(e.data.BackGateVoltage);
+                AddCurveForBackGate(e.data.BackGateVoltage);
+            }
+            _zgcController.AddToCurve(new PointPairList(new double[] { e.data.FrontGateVoltage }, new double[] { e.data.SampleCurrent }), _CurrentCurveName);
+            _zgcController.Refresh();
         }
         private void DataArrived(object sender, PointArrivedEventArgs data)
         {
@@ -74,7 +87,7 @@ namespace GmMeasurement
         public void FinishMeasurement()
         {
             AllCustomEvents.Instance.DataPoint_Arrived -= DataArrived;
-
+            AllCustomEvents.Instance.DoubleGatedPoint_Arrived -= DoubleGatedPointArrived;
         }
         private string GenerateCurveName(double BackGate)
         {

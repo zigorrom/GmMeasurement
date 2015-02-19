@@ -8,7 +8,8 @@ namespace GmMeasurement
 {
     class ListGmDataString : ListDataString
     {
-        public ListGmDataString(){
+        public ListGmDataString()
+        {
             this.DataString = new GmDataString();
             this.ListOfData = new List<MeasurDataInterface>();
 
@@ -16,13 +17,13 @@ namespace GmMeasurement
             FileSubheader = "V\tV\tV\tA\tA/V\tA\tA";
             FileName = "GmMeasurement.dat";
         }
-            public void GetDataFromEventAndWriteToOpenedFile(PointArrivedEventArgs data)
-            {
-                ListOfData.Clear();
-                ListOfData.Add(data.data);
-                this.writeToFile();
-            }
-
+        public void GetDataFromEventAndWriteToOpenedFile(PointArrivedEventArgs data)
+        {
+            ListOfData.Clear();
+            ListOfData.Add(data.data);
+            this.writeToFile();
         }
+
     }
+}
 

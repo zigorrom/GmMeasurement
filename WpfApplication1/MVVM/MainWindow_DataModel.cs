@@ -248,14 +248,37 @@ namespace GmMeasurement
             }
         }
 
-        private double _StimulationValue = 1;
-        public double StimulationValue
+        private double _StimulationValueFG = 1;
+        public double StimulationValueFG
         {
-            get { return _StimulationValue; }
+            get { return _StimulationValueFG; }
             set
             {
-                _StimulationValue = value;
-                OnPropertyChanged("StimulationValue");
+                _StimulationValueFG = value;
+                OnPropertyChanged("StimulationValueFG");
+            }
+        }
+
+        private double _StimulationValueBG = 1;
+        public double StimulationValueBG
+        {
+            get { return _StimulationValueBG; }
+            set
+            {
+                _StimulationValueBG = value;
+                OnPropertyChanged("StimulationValueBG");
+            }
+        }
+
+        private bool _DoubleGatedMeasurement = false;
+        public bool DoubleGatedMeasurement
+        {
+            get { return _DoubleGatedMeasurement; }
+            set
+            {
+                _DoubleGatedMeasurement = value;
+                OnPropertyChanged("DoubleGatedMeasurement");
+                //System.Windows.Forms.MessageBox.Show(_DoubleGatedMeasurement.ToString());
             }
         }
     }
