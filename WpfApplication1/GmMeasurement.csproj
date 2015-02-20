@@ -34,10 +34,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Devices, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>bin\Debug\Devices.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
@@ -128,6 +124,10 @@
     <Resource Include="Resources\open.png" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Devices\Devices.csproj">
+      <Project>{ae52526e-d660-426e-a2ec-1a475b02aa9e}</Project>
+      <Name>Devices</Name>
+    </ProjectReference>
     <ProjectReference Include="..\HP34401AMultimeter\HP34401AMultimeter.csproj">
       <Project>{f1520dd0-677c-4016-bbc2-935cfcbe7f69}</Project>
       <Name>HP34401AMultimeter</Name>
