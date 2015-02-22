@@ -151,7 +151,7 @@
                     </Grid.ColumnDefinitions>
                 
                     <TextBox Margin="1,1,4,1" Text="{Binding StimulationValueFG,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" VerticalContentAlignment="Center"  />
-                    <Button Grid.Column="1" Content="Mea" Width="Auto" HorizontalAlignment="Right" Click="MeasureStimulationValue"  />
+                    <Button Grid.Column="1" Content="Mea" Width="Auto" HorizontalAlignment="Right" Click="MeasureStimulationValue" Height="32" VerticalAlignment="Bottom"  />
 
                 </Grid>
 
