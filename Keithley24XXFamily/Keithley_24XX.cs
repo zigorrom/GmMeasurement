@@ -8,11 +8,11 @@ using System.Globalization;
 using Devices;
 namespace Keithley24XXFamily
 {
-    public enum Keithley24XX_MeasurementSpeed{Fast, Middle, Slow};
+    public enum Keithley24XX_MeasurementSpeed { Fast, Middle, Slow };
     public class Keithley_24XX : GPIB_Device
     {
         public Keithley_24XX(byte _PrimaryAddress, byte _SecondaryAddress, byte _BoardNumber) : base(_PrimaryAddress, _SecondaryAddress, _BoardNumber) { }
-        public Keithley_24XX(string IDN, int DeviceOrder=0,byte _BoardNumber=0) : base(IDN, DeviceOrder, _BoardNumber) { }
+        public Keithley_24XX(string IDN, int DeviceOrder = 0, byte _BoardNumber = 0) : base(IDN, DeviceOrder, _BoardNumber) { }
 
         public override bool InitDevice()
         {
@@ -25,7 +25,7 @@ namespace Keithley24XXFamily
                 this.SendCommandRequest(":SOUR:FUNC VOLT");
                 //enable source as Voltage
                 SetCurrentAndVoltageMeasurement();
-                
+
             }
             catch
             {
@@ -37,7 +37,7 @@ namespace Keithley24XXFamily
         {
             var Command1 = ":SENS:CURR:NPLC";
             var Command2 = ":SENS:VOLT:NPLC";
-            switch(Speed)
+            switch (Speed)
             {
                 case Keithley24XX_MeasurementSpeed.Fast: { Command1 += " MIN"; Command2 += " MIN"; break; }
                 case Keithley24XX_MeasurementSpeed.Middle: { Command1 += " DEF"; Command2 += " DEF"; break; }
@@ -68,19 +68,19 @@ namespace Keithley24XXFamily
         }
         public bool SetVoltageLimit(double Value)
         {
-            
-                var command = ":SENS:VOLT:PROT {0}";
-                StringBuilder CommandBuilder = new StringBuilder();
-                try
-                {
-                    this.SendCommandRequest(CommandBuilder.AppendFormat(command, Value).ToString());
-                }
-                catch
-                {
-                    this.isAlive = false;
-                }
-                return this.isAlive;
-            
+
+            var command = ":SENS:VOLT:PROT {0}";
+            StringBuilder CommandBuilder = new StringBuilder();
+            try
+            {
+                this.SendCommandRequest(CommandBuilder.AppendFormat(command, Value).ToString());
+            }
+            catch
+            {
+                this.isAlive = false;
+            }
+            return this.isAlive;
+
         }
 
         public bool SetCurrentAndVoltageMeasurement()
@@ -91,7 +91,7 @@ namespace Keithley24XXFamily
                 //Set 1 measurement for read
                 this.SendCommandRequest(":SENS:FUNC 'CURR'");
                 this.SendCommandRequest(":SENS:FUNC 'VOLT'");
-                
+
 
             }
             catch
@@ -101,21 +101,21 @@ namespace Keithley24XXFamily
             return this.isAlive;
         }
 
-        public bool  SetVoltageMeasurement()
+        public bool SetVoltageMeasurement()
         {
-              try
-              {
-                  this.SendCommandRequest(":SENS:FUNC:CONC 0");
-                  //Set 1 measurement for read
-                  this.SendCommandRequest(":SENS:FUNC 'VOLT'");
-              
+            try
+            {
+                this.SendCommandRequest(":SENS:FUNC:CONC 0");
+                //Set 1 measurement for read
+                this.SendCommandRequest(":SENS:FUNC 'VOLT'");
 
-              }
-              catch
-              {
-                  this.isAlive = false;
-              }
-              return this.isAlive;
+
+            }
+            catch
+            {
+                this.isAlive = false;
+            }
+            return this.isAlive;
         }
         public bool Reset()
         {
@@ -130,7 +130,7 @@ namespace Keithley24XXFamily
             }
             return this.isAlive;
         }
-       public bool SourceVoltage(double Value)
+        public bool SourceVoltage(double Value)
         {
             var command = ":SOUR:VOLT {0}";
             NumberFormatInfo a = new NumberFormatInfo();
@@ -139,7 +139,7 @@ namespace Keithley24XXFamily
             StringBuilder CommandBuilder = new StringBuilder();
             try
             {
-                this.SendCommandRequest(CommandBuilder.AppendFormat(a,command, Value).ToString());
+                this.SendCommandRequest(CommandBuilder.AppendFormat(a, command, Value).ToString());
             }
             catch
             {
@@ -148,7 +148,7 @@ namespace Keithley24XXFamily
             return this.isAlive;
         }
 
-      public  bool SourceCurrent(double Value)
+        public bool SourceCurrent(double Value)
         {
             var command = ":SOUR:CURR {0}";
             StringBuilder CommandBuilder = new StringBuilder();
@@ -168,7 +168,7 @@ namespace Keithley24XXFamily
             {
                 this.SendCommandRequest(":DISP:WIND1:TEXT:STAT ON");
                 //Set 1 measurement for read  
-                this.SendCommandRequest(":DISP:WIND1:TEXT:DATA '" + Text+"'");
+                this.SendCommandRequest(":DISP:WIND1:TEXT:DATA '" + Text + "'");
                 Thread.Sleep(1000);
                 this.SendCommandRequest(":DISP:WIND1:TEXT:STAT OFF");
             }
@@ -178,30 +178,34 @@ namespace Keithley24XXFamily
             }
             return this.isAlive;
         }
-     public   bool MeasureAll(out double Voltage, out double Current, out double Resistance)
+        public bool MeasureAll(out double Voltage, out double Current, out double Resistance)
         {
             string result;
-            try {
-               result = this.RequestQuery(":READ?");
+            try
+            {
+                result = this.RequestQuery(":READ?");
             }
-            catch {
+            catch
+            {
                 result = "0,0,0";
-                isAlive = false; 
+                isAlive = false;
             }
             string[] answers = result.Split(',');
             NumberFormatInfo a = new NumberFormatInfo();
             a.NumberDecimalSeparator = ".";
             a.NumberGroupSeparator = "";
-            try{
-                 Voltage = Convert.ToDouble(answers[0], a);
-                 Current = Convert.ToDouble(answers[1], a);
-                 Resistance = Convert.ToDouble(answers[2], a);
-                }
+            try
+            {
+                Voltage = Convert.ToDouble(answers[0], a);
+                Current = Convert.ToDouble(answers[1], a);
+                Resistance = Convert.ToDouble(answers[2], a);
+            }
 
-            catch{
-                Voltage=0;
-                Current=0;
-                Resistance=0;
+            catch
+            {
+                Voltage = 0;
+                Current = 0;
+                Resistance = 0;
             }
             return isAlive;
         }
