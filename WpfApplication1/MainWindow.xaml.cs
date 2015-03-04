@@ -155,10 +155,16 @@ System.Windows.Forms.DialogResult result = dialog.ShowDialog();
         private void FinishAllAfterMeasurement(object sender, EventArgs e)
         {
             GraphicManager.FinishMeasurement();
-            SingleGateFileManager.FinishMeasurement();
-            SingleGateMeasurer = null;
-            DoubleGateFileManager.FinishMeasurement();
-            DoubleGateMeasurer = null;
+            if (!model.DoubleGatedMeasurement)
+            {
+                SingleGateFileManager.FinishMeasurement();
+                SingleGateMeasurer = null;
+            }
+            else
+            {
+                DoubleGateFileManager.FinishMeasurement();
+                DoubleGateMeasurer = null;
+            }
         }
 
         private void StopMeasurement(object sender, System.Windows.RoutedEventArgs e)
@@ -166,8 +172,10 @@ System.Windows.Forms.DialogResult result = dialog.ShowDialog();
         	// TODO: Add event handler implementation here.
             if (ImportantConstants.MeasurementInProgress)
             {
-                SingleGateMeasurer.StopGmMeasurement();
-                DoubleGateMeasurer.StopGmMeasurement();
+                if (!model.DoubleGatedMeasurement)
+                    SingleGateMeasurer.StopGmMeasurement();
+                else
+                    DoubleGateMeasurer.StopGmMeasurement();
             }
             
         }
