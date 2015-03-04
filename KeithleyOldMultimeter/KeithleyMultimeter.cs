@@ -14,7 +14,7 @@ namespace KeithleyOldMultimeter
 
         public bool ReadVoltage(out double Voltage)
         {
-            {
+            
 
                 string result;
                 try
@@ -41,7 +41,7 @@ namespace KeithleyOldMultimeter
                 }
                 return isAlive;
 
-            }
+            
         }
     }
 
