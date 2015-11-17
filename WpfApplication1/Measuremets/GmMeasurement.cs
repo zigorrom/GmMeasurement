@@ -137,6 +137,7 @@ namespace GmMeasurement
                     counter++;
                     int progress =  (int)(((double)counter / (double)total_count) * 100.0);
                     worker.ReportProgress(progress);
+
                 }
             }
 
