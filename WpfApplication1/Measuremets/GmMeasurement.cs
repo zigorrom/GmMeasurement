@@ -11,6 +11,8 @@ using HP34401A;
 using Devices;
 using KeithleyOldMultimeter;
 using StanfordLockInSR830;
+using Helper.Ranges.DoubleRange;
+using Helper.Ranges.RangeHandlers;
 
 namespace GmMeasurement
 {
@@ -110,14 +112,20 @@ namespace GmMeasurement
         private void MapGmInWorker(object sender, DoWorkEventArgs e )
         {
             BackgroundWorker worker = sender as BackgroundWorker;
-            int total_count = _MeasurementParameters.FrontGateVoltageNumberOfPoints*_MeasurementParameters.BackGateNumberOfPoints;
+            ZeroCrossingBackAndForthRangeHandler outer = new ZeroCrossingBackAndForthRangeHandler(new DoubleRangeBase(_MeasurementParameters.BackGateVoltageStart, _MeasurementParameters.BackGateVoltageStop, _MeasurementParameters.BackGateVoltageIncrement));
+            ZeroCrossingBackAndForthRangeHandler inner = new ZeroCrossingBackAndForthRangeHandler(new DoubleRangeBase(_MeasurementParameters.FrontGateVoltageStart, _MeasurementParameters.FrontGateVoltageStop, _MeasurementParameters.FrontGateVoltageIncrement));
+            int total_count = outer.TotalPoints * inner.TotalPoints; ///_MeasurementParameters.FrontGateVoltageNumberOfPoints*_MeasurementParameters.BackGateNumberOfPoints;
             int counter=0;
             FrontGateKeithley.SourceVoltage(0);
             BackGateKeithley.SourceVoltage(0);
             FrontGateKeithley.SwitchOn();
             BackGateKeithley.SwitchOn();
-            for (double BackGateVoltage = _MeasurementParameters.BackGateVoltageStart; (_MeasurementParameters.BackGateVoltageStart <= _MeasurementParameters.BackGateVoltageStop) ? (BackGateVoltage <= _MeasurementParameters.BackGateVoltageStop) : ((BackGateVoltage >= _MeasurementParameters.BackGateVoltageStop)); BackGateVoltage += _MeasurementParameters.BackGateVoltageIncrement)
-                for (double FrontGateVoltage = _MeasurementParameters.FrontGateVoltageStart; (_MeasurementParameters.FrontGateVoltageStart <= _MeasurementParameters.FrontGateVoltageStop) ? (FrontGateVoltage <= _MeasurementParameters.FrontGateVoltageStop) : (FrontGateVoltage >= _MeasurementParameters.FrontGateVoltageStop); FrontGateVoltage += _MeasurementParameters.FrontGateVoltageIncrement)
+
+            
+
+            foreach (var backVolt in outer)
+            {
+                foreach (var frontVolt in inner)
                 {
                     if (worker.CancellationPending)
                     {
@@ -125,11 +133,34 @@ namespace GmMeasurement
                         ImportantConstants.MeasurementInProgress = false;
                         break;
                     }
-                    PerformSinglePointMeasurement(FrontGateVoltage, BackGateVoltage);
+                    PerformSinglePointMeasurement(frontVolt, backVolt);
                     counter++;
-                    int progress = (int)(((double)counter / (double)total_count) * 100.0);
+                    int progress =  (int)(((double)counter / (double)total_count) * 100.0);
                     worker.ReportProgress(progress);
                 }
+            }
+
+            #region OBSOLETE CYCLE
+            ///
+            /// OBSOLETE CYCLE
+            ///
+
+            //for (double BackGateVoltage = _MeasurementParameters.BackGateVoltageStart; (_MeasurementParameters.BackGateVoltageStart <= _MeasurementParameters.BackGateVoltageStop) ? (BackGateVoltage <= _MeasurementParameters.BackGateVoltageStop) : ((BackGateVoltage >= _MeasurementParameters.BackGateVoltageStop)); BackGateVoltage += _MeasurementParameters.BackGateVoltageIncrement)
+            //    for (double FrontGateVoltage = _MeasurementParameters.FrontGateVoltageStart; (_MeasurementParameters.FrontGateVoltageStart <= _MeasurementParameters.FrontGateVoltageStop) ? (FrontGateVoltage <= _MeasurementParameters.FrontGateVoltageStop) : (FrontGateVoltage >= _MeasurementParameters.FrontGateVoltageStop); FrontGateVoltage += _MeasurementParameters.FrontGateVoltageIncrement)
+            //    {
+            //        if (worker.CancellationPending)
+            //        {
+            //            e.Cancel = true;
+            //            ImportantConstants.MeasurementInProgress = false;
+            //            break;
+            //        }
+            //        PerformSinglePointMeasurement(FrontGateVoltage, BackGateVoltage);
+            //        counter++;
+            //        int progress = (int)(((double)counter / (double)total_count) * 100.0);
+            //        worker.ReportProgress(progress);
+            //    }
+            #endregion
+
             FrontGateKeithley.SwitchOFF();
             BackGateKeithley.SwitchOFF();
             
